@@ -7,11 +7,9 @@ from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.sdk.resources import Resource
 from logging import basicConfig, INFO, getLogger
 
-# Set up logging
 basicConfig(level=INFO)
 logger = getLogger(__name__)
 
-# Set the service name
 resource = Resource(attributes={
     "service.name": "serviceC"
 })
