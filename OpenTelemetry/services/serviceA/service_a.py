@@ -9,13 +9,12 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.resources import Resource
 from logging import basicConfig, INFO, getLogger
 
-# Set up logging
 basicConfig(level=INFO)
 logger = getLogger(__name__)
 
-# Set the service name
+
 resource = Resource(attributes={
-    "service.name": "serviceA"  # Replace with your actual service name
+    "service.name": "serviceA"  
 })
 
 app = Flask(__name__)
@@ -25,7 +24,6 @@ RequestsInstrumentor().instrument()
 trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer = trace.get_tracer(__name__)
 
-# Configure the OTLP exporter
 otlp_exporter = OTLPSpanExporter(endpoint="http://opentelemetry-collector.istio-system.svc.cluster.local:4318/v1/traces")
 trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(otlp_exporter))
 

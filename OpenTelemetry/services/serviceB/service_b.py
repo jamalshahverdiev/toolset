@@ -9,31 +9,25 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.resources import Resource
 from logging import basicConfig, INFO, getLogger
 
-# Set up logging
 basicConfig(level=INFO)
 logger = getLogger(__name__)
 
-# Set the service name
 resource = Resource(attributes={
-    "service.name": "serviceB"  # Replace with your actual service name
+    "service.name": "serviceB"  
 })
 
 app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
-# Instrument the requests library for outbound HTTP requests
-RequestsInstrumentor().instrument()  # Instrument requests
+RequestsInstrumentor().instrument()  
 
-# Configure the tracer provider with the service name resource
 trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer = trace.get_tracer(__name__)
 
-# Configure the OTLP exporter
 otlp_exporter = OTLPSpanExporter(endpoint="http://opentelemetry-collector.istio-system.svc.cluster.local:4318/v1/traces")
 trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(otlp_exporter))
 
 @app.route("/")
 def home():
-    # Call ServiceC
     with tracer.start_as_current_span("call-service-c") as span:
         trace_id = span.get_span_context().trace_id
         logger.info(f"Calling service C with Trace ID: {trace_id:x}")
